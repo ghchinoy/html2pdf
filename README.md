@@ -14,6 +14,4 @@ For use in applications like [Fabulae](https://github.com/ghchinoy/fabulae).
 
 ```
 go run *.go --url https://cloud.google.com/transform/gen-ai-kpis-measuring-ai-success-deep-dive --dir samples
-
-go run *.go -url "https://www.sciencedirect.com/science/article/abs/pii/S0198971524000516#s0050" --dir samples
 ```
