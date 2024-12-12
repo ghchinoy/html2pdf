@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/chromedp/cdproto/page"
@@ -13,11 +14,13 @@ import (
 )
 
 var (
-	pageURL string
+	pageURL   string
+	outputDir string
 )
 
 func init() {
 	flag.StringVar(&pageURL, "url", "", "webpage to PDF")
+	flag.StringVar(&outputDir, "dir", ".", "output directory")
 	flag.Parse()
 }
 
@@ -49,10 +52,11 @@ func main() {
 	}
 
 	filename := fmt.Sprintf("%s.pdf", title)
-	if err := os.WriteFile(filename, buf, 0o644); err != nil {
+	fullPath := filepath.Join(outputDir, filename)
+	if err := os.WriteFile(fullPath, buf, 0o644); err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("wrote %s\n", filename)
+	fmt.Printf("wrote %s\n", fullPath)
 }
 
 // print a specific pdf page.
