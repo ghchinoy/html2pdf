@@ -25,14 +25,21 @@ func init() {
 }
 
 func main() {
+	// guard against blank page URL
+	if pageURL == "" {
+		log.Print("requires a --url")
+		os.Exit(1)
+	}
 	// create context
 	ctx, cancel := chromedp.NewContext(context.Background())
 	defer cancel()
 
 	var title string
+	var buf []byte
 	err := chromedp.Run(ctx,
-		chromedp.Navigate(pageURL),
-		chromedp.Title(&title),
+		chromedp.Navigate(pageURL), // navigate to a page,
+		chromedp.Title(&title),     // get the title,
+		printToPDF(pageURL, &buf),  // obtain a pdf of the page
 	)
 	if err != nil {
 		log.Fatal(err)
@@ -43,12 +50,6 @@ func main() {
 
 	if len(title) > 15 {
 		title = string([]rune(title)[:15])
-	}
-
-	// capture pdf
-	var buf []byte
-	if err := chromedp.Run(ctx, printToPDF(pageURL, &buf)); err != nil {
-		log.Fatal(err)
 	}
 
 	filename := fmt.Sprintf("%s.pdf", title)
