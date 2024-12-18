@@ -34,6 +34,7 @@ func main() {
 	ctx, cancel := chromedp.NewContext(context.Background())
 	defer cancel()
 
+	// get an html page and create pdf bytes
 	var title string
 	var buf []byte
 	err := chromedp.Run(ctx,
@@ -45,14 +46,15 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// create a filename from the title
 	title = strings.TrimSpace(title)
 	title = strings.ReplaceAll(title, " ", "")
-
 	if len(title) > 15 {
 		title = string([]rune(title)[:15])
 	}
-
 	filename := fmt.Sprintf("%s.pdf", title)
+
+	// write the pdf output file
 	fullPath := filepath.Join(outputDir, filename)
 	if err := os.WriteFile(fullPath, buf, 0o644); err != nil {
 		log.Fatal(err)
@@ -60,7 +62,7 @@ func main() {
 	fmt.Printf("wrote %s\n", fullPath)
 }
 
-// print a specific pdf page.
+// printToPDF print a specific pdf page.
 func printToPDF(urlstr string, res *[]byte) chromedp.Tasks {
 	return chromedp.Tasks{
 		chromedp.Navigate(urlstr),
