@@ -1,3 +1,5 @@
 *.wav
 *_transcript.txt
 output
+.DS_Store
+
