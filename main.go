@@ -18,12 +18,15 @@ var (
 	pageURL string
 	// outputDir is the directory where the PDF will be saved
 	outputDir string
+	// outputFile is the name of the output file
+	outputFile string
 )
 
 // init initializes the command-line flags.
 func init() {
 	flag.StringVar(&pageURL, "url", "", "webpage to PDF")
 	flag.StringVar(&outputDir, "dir", ".", "output directory")
+	flag.StringVar(&outputFile, "output", "", "output file name")
 	flag.Parse()
 }
 
@@ -37,7 +40,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	buf, filename, err := html2pdf(pageURL)
+	buf, filename, err := html2pdf(pageURL, outputFile)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -53,7 +56,7 @@ func main() {
 // html2pdf converts a given URL to a PDF.
 // It uses chromedp to navigate to the URL, get the title, and print the page to PDF.
 // It returns the PDF content as a byte slice, the generated filename, and an error if any.
-func html2pdf(pageURL string) ([]byte, string, error) {
+func html2pdf(pageURL, outputFile string) ([]byte, string, error) {
 	// create context
 	ctx, cancel := chromedp.NewContext(context.Background())
 	defer cancel()
@@ -71,12 +74,17 @@ func html2pdf(pageURL string) ([]byte, string, error) {
 	}
 
 	// create a filename from the title
-	title = strings.TrimSpace(title)
-	title = strings.ReplaceAll(title, " ", "")
-	if len(title) > 15 {
-		title = string([]rune(title)[:15])
+	var filename string
+	if outputFile != "" {
+		filename = outputFile
+	} else {
+		title = strings.TrimSpace(title)
+		title = strings.ReplaceAll(title, " ", "")
+		if len(title) > 15 {
+			title = string([]rune(title)[:15])
+		}
+		filename = fmt.Sprintf("%s.pdf", title)
 	}
-	filename := fmt.Sprintf("%s.pdf", title)
 
 	return buf, filename, nil
 }
